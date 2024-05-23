@@ -21,6 +21,7 @@ builder.Host.ConfigureLogging(logging =>
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHostedService<AdminInitializer>();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "My API", Version = "v1" });
