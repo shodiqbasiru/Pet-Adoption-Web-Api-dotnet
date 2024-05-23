@@ -18,6 +18,11 @@ public class ExceptionHandlingMiddleware : IMiddleware
     {
         try
         {
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (authHeader == null)
+            {
+                throw new UnauthorizedException("Full authentication is required to access this resource");
+            }
             await next(context); 
         }
         catch (Exception e)
