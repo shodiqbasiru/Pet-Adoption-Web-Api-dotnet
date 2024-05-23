@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Authentication;
 using PetAdoptionAPI.Exceptions;
 using PetAdoptionAPI.Models.Responses;
 
@@ -18,12 +19,19 @@ public class ExceptionHandlingMiddleware : IMiddleware
     {
         try
         {
+            var path = context.Request.Path;
+            if (path.StartsWithSegments("/api/auth/login") || path.StartsWithSegments("/api/auth/register"))
+            {
+                await next(context);
+                return;
+            }
+            
             var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
             if (authHeader == null)
             {
                 throw new UnauthorizedException("Full authentication is required to access this resource");
             }
-            await next(context); 
+            await next(context);
         }
         catch (Exception e)
         {
@@ -47,6 +55,18 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 error.Status = HttpStatusCode.Unauthorized.ToString();
                 error.Message = exception.Message;
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                break;
+            case AuthenticationException:
+                error.Code = (int)HttpStatusCode.Unauthorized;
+                error.Status = HttpStatusCode.Unauthorized.ToString();
+                error.Message = exception.Message;
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                break;
+            case AuthorizationException:
+                error.Code = (int)HttpStatusCode.Forbidden;
+                error.Status = HttpStatusCode.Forbidden.ToString();
+                error.Message = exception.Message;
+                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 break;
             case BadRequestException:
                 error.Code = (int)HttpStatusCode.BadRequest;
