@@ -1,4 +1,5 @@
 using PetAdoptionAPI.Entities;
+using PetAdoptionAPI.Exceptions;
 using PetAdoptionAPI.Repositories;
 
 namespace PetAdoptionAPI.Services.impls;
@@ -24,7 +25,7 @@ public class CustomerService : ICustomerService
     public async Task<Customer> GetById(string id)
     {
         var customer = await _repository.FindByIdAsync(Guid.Parse(id));
-        if (customer is null) throw new Exception("customer not found");
+        if (customer is null) throw new NotFoundException("customer not found");
         return customer;
     }
 

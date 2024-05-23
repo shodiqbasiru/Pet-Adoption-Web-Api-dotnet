@@ -1,4 +1,5 @@
 using PetAdoptionAPI.Entities;
+using PetAdoptionAPI.Exceptions;
 using PetAdoptionAPI.Repositories;
 
 namespace PetAdoptionAPI.Services.impls;
@@ -28,7 +29,7 @@ public class PetService : IPetService
         try
         {
             var pet = await _repository.FindByIdAsync(Guid.Parse(id));
-            if (pet is null) throw new Exception("pet not found");
+            if (pet is null) throw new NotFoundException("pet not found");
 
             return pet;
         }

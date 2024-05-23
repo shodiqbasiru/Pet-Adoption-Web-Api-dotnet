@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PetAdoptionAPI.Middlewares;
 using PetAdoptionAPI.Repositories;
 using PetAdoptionAPI.Security;
 using PetAdoptionAPI.Security.impls;
@@ -10,11 +11,15 @@ using PetAdoptionAPI.Services;
 using PetAdoptionAPI.Services.impls;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+});
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -77,6 +82,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IPurchaseService,PurchaseService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
+builder.Services.AddScoped<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
@@ -87,11 +93,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

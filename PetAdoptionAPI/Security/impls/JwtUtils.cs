@@ -18,8 +18,7 @@ public class JwtUtils : IJwtUtils
 
     public string GenerateJwtToken(Account account)
     {
-        var jwtSecretKey = Environment.GetEnvironmentVariable("JWTSuperSecretKey");
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey!));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
         
         var securityToken = new JwtSecurityToken(

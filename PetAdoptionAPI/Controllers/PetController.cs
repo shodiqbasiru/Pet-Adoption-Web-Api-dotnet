@@ -44,4 +44,17 @@ public class PetController : ControllerBase
         };
         return Ok(response);
     }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPetById(string id)
+    {
+        var pet = await _petService.GetById(id);
+        var response = new CustomResponse<Pet>
+        {
+            StatusCode = (int) HttpStatusCode.OK,
+            Message = "Get Data Successfully",
+            Data = pet,
+        };
+        return Ok(response);
+    }
 }

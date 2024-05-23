@@ -1,5 +1,6 @@
 using PetAdoptionAPI.Constants;
 using PetAdoptionAPI.Entities;
+using PetAdoptionAPI.Exceptions;
 using PetAdoptionAPI.Models.Requests;
 using PetAdoptionAPI.Models.Responses;
 using PetAdoptionAPI.Repositories;
@@ -24,6 +25,8 @@ public class AuthService : IAuthService
 
     public async Task<RegisterResponse> RegisterCustomer(RegisterRequest request)
     {
+        var user = _repository.FindAsync(acc => acc.Username.ToLower().Equals(request.Username.ToLower()) );
+        if (user != null) throw new DuplicateDataException("Username already exists");
         
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
