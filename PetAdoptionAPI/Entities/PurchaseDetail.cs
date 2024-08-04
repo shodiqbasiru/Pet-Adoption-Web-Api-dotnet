@@ -18,6 +18,6 @@ public class PurchaseDetail
     [Column(name: "qty")]
     public uint Qty { get; set; }
 
-    public Purchase Purchase { get; set; } // many to one with purchase
-    public Product Pet { get; set; }
+    public Purchase? Purchase { get; set; } 
+    public Product? Product { get; set; }
 }

@@ -31,17 +31,37 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Category>()
         .Property(c => c.CategoryName).IsRequired();
 
+        // relationship between Account and Customer
+        modelBuilder.Entity<Customer>()
+        .HasOne(c => c.Account)
+        .WithOne(a => a.Customer)
+        .HasForeignKey<Customer>(c => c.AccountId);
+
         // relationship between Product and Category
         modelBuilder.Entity<Product>()
             .HasOne(p => p.Category)
             .WithMany(c => c.Products)
             .HasForeignKey(p => p.CategoryId);
 
+        // relationship between Customer and Purchase
+        modelBuilder.Entity<Purchase>()
+        .HasOne(p => p.Customer)
+        .WithMany(c => c.Purchases)
+        .HasForeignKey(p => p.CustomerId);
+
+        // relationship between Purchase and Purchase Detail
+        modelBuilder.Entity<PurchaseDetail>()
+        .HasOne(pd => pd.Purchase)
+        .WithMany(p => p.PurchaseDetails)
+        .HasForeignKey(pd => pd.PurchaseId);
+
+        // convert enum to string
         modelBuilder.Entity<Account>()
             .Property(e => e.Role)
             .HasConversion(
                 v => v.ToString(),
                 v => (Role)Enum.Parse(typeof(Role), v));
+
 
         base.OnModelCreating(modelBuilder);
     }

@@ -12,7 +12,7 @@ using PetAdoptionAPI.Repositories;
 namespace PetAdoptionAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240802041533_InitialCreate")]
+    [Migration("20240804132140_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -97,27 +97,25 @@ namespace PetAdoptionAPI.Migrations
                         .HasColumnName("account_id");
 
                     b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("NVarchar(250)")
+                        .HasColumnType("Varchar(250)")
                         .HasColumnName("address");
 
                     b.Property<string>("CustomerName")
-                        .HasColumnType("NVarchar(50)")
+                        .HasColumnType("Varchar(50)")
                         .HasColumnName("customer_name");
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("NVarchar(50)")
+                        .HasColumnType("Varchar(50)")
                         .HasColumnName("email");
 
                     b.Property<string>("MobilePhone")
-                        .IsRequired()
-                        .HasColumnType("NVarchar(14)")
+                        .HasColumnType("Varchar(14)")
                         .HasColumnName("mobile_phone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
                     b.ToTable("m_customer");
                 });
@@ -206,6 +204,9 @@ namespace PetAdoptionAPI.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("pet_id");
 
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("PurchaseId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("purchase_id");
@@ -216,7 +217,7 @@ namespace PetAdoptionAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PetId");
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("PurchaseId");
 
@@ -226,8 +227,8 @@ namespace PetAdoptionAPI.Migrations
             modelBuilder.Entity("PetAdoptionAPI.Entities.Customer", b =>
                 {
                     b.HasOne("PetAdoptionAPI.Entities.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
+                        .WithOne("Customer")
+                        .HasForeignKey("PetAdoptionAPI.Entities.Customer", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -248,7 +249,7 @@ namespace PetAdoptionAPI.Migrations
             modelBuilder.Entity("PetAdoptionAPI.Entities.Purchase", b =>
                 {
                     b.HasOne("PetAdoptionAPI.Entities.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Purchases")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -258,11 +259,9 @@ namespace PetAdoptionAPI.Migrations
 
             modelBuilder.Entity("PetAdoptionAPI.Entities.PurchaseDetail", b =>
                 {
-                    b.HasOne("PetAdoptionAPI.Entities.Product", "Pet")
+                    b.HasOne("PetAdoptionAPI.Entities.Product", "Product")
                         .WithMany()
-                        .HasForeignKey("PetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProductId");
 
                     b.HasOne("PetAdoptionAPI.Entities.Purchase", "Purchase")
                         .WithMany("PurchaseDetails")
@@ -270,14 +269,24 @@ namespace PetAdoptionAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Pet");
+                    b.Navigation("Product");
 
                     b.Navigation("Purchase");
+                });
+
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Account", b =>
+                {
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("PetAdoptionAPI.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Customer", b =>
+                {
+                    b.Navigation("Purchases");
                 });
 
             modelBuilder.Entity("PetAdoptionAPI.Entities.Purchase", b =>

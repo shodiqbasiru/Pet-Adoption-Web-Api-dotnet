@@ -10,22 +10,20 @@ namespace PetAdoptionAPI.Services.impls;
 
 public class AuthService : IAuthService
 {
-    private readonly IRepository<Account> _repository;
-    private readonly IPersistence _persistence;
+    private readonly IUnitOfWork _uow;
     private readonly ICustomerService _customerService;
     private readonly IJwtUtils _jwtUtils;
 
-    public AuthService(IRepository<Account> repository, IPersistence persistence, ICustomerService customerService, IJwtUtils jwtUtils)
+    public AuthService(IUnitOfWork uow, ICustomerService customerService, IJwtUtils jwtUtils)
     {
-        _repository = repository;
-        _persistence = persistence;
+        _uow = uow;
         _customerService = customerService;
         _jwtUtils = jwtUtils;
     }
 
     public async Task<RegisterResponse> RegisterCustomer(RegisterRequest request)
     {
-        var user = _repository.FindAsync(acc => acc.Username.ToLower().Equals(request.Username.ToLower()) );
+        var user = await _uow.Repository<Account>().FindAsync(acc => acc.Username.ToLower().Equals(request.Username.ToLower()) );
         if (user != null) throw new DuplicateDataException("Username already exists");
         
         var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -39,8 +37,8 @@ public class AuthService : IAuthService
             IsActive = true
         };
 
-        var account = await _repository.SaveAsync(payload);
-        await _persistence.SaveChangesAsync();
+        var account = await _uow.Repository<Account>().SaveAsync(payload);
+        await _uow.SaveChangesAsync();
 
         Customer payloadCustomer = new()
         {
@@ -51,16 +49,16 @@ public class AuthService : IAuthService
 
         return new RegisterResponse
         {
-            Id = account.Id.ToString(),
+            Id = account.Id,
             Username = account.Username,
             Name = customer.CustomerName!,
-            role = account.Role.ToString()
+            Role = account.Role.ToString()
         };
     }
 
     public async Task<LoginResponse> Login(LoginRequest request)
     {
-        var account = await _repository.FindAsync(user => user.Username.ToLower().Equals(request.Username));
+        var account = await _uow.Repository<Account>().FindAsync(user => user.Username.ToLower().Equals(request.Username));
         if (account is null) throw new UnauthorizedAccessException("Unauthorized");
         
         if (!BCrypt.Net.BCrypt.Verify(request.Password, account.Password))

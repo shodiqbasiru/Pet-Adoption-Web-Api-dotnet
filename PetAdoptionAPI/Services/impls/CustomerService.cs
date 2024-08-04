@@ -1,50 +1,74 @@
 using PetAdoptionAPI.Entities;
 using PetAdoptionAPI.Exceptions;
+using PetAdoptionAPI.Mappers;
+using PetAdoptionAPI.Models.Requests;
 using PetAdoptionAPI.Repositories;
 
 namespace PetAdoptionAPI.Services.impls;
 
 public class CustomerService : ICustomerService
 {
-    private readonly IRepository<Customer> _repository;
-    private readonly IPersistence _persistence;
+    private readonly IUnitOfWork _uow;
 
-    public CustomerService(IRepository<Customer> repository, IPersistence persistence)
+    public CustomerService(IUnitOfWork uow)
     {
-        _repository = repository;
-        _persistence = persistence;
+        _uow = uow;
     }
 
     public async Task<Customer> Create(Customer payload)
     {
-        var customer = await _repository.SaveAsync(payload);
-        await _persistence.SaveChangesAsync();
+        var customer = await _uow.Repository<Customer>().SaveAsync(payload);
+        await _uow.SaveChangesAsync();
         return customer;
     }
 
-    public async Task<Customer> GetById(string id)
+    public async Task<Customer> FindById(Guid id)
     {
-        var customer = await _repository.FindByIdAsync(Guid.Parse(id));
-        if (customer is null) throw new NotFoundException("customer not found");
-        return customer;
+        return await _uow.Repository<Customer>().FindByIdAsync(id) ?? throw new NotFoundException("customer not found");
     }
 
-    public async Task<List<Customer>> GetAll()
+    public async Task<CustomerResponse> FindCustomerById(Guid id)
     {
-        return await _repository.FindAllAsync();
+        var customer = await FindById(id);
+        return customer.ConvertToCustomerResponse();
     }
 
-    public async Task<Customer> Update(Customer payload)
+    public async Task<List<CustomerResponse>> GetAll()
     {
-        var customer = _repository.Update(payload);
-        await _persistence.SaveChangesAsync();
-        return customer;
+        try
+        {
+            string[] includes = { "Account" };
+            var customers = await _uow.Repository<Customer>().FindAllAsync(includes); // TODO: Masih Harus di perbaiki untuk melakuka get All with Is active Account
+            return customers.ConvertToCustomerResponses();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.StackTrace);
+            throw;
+        }
     }
 
-    public async Task DeleteById(string id)
+    public async Task<CustomerResponse> Update(CustomerUpdateRequest request)
     {
-        var customer = await GetById(id);
-        _repository.Delete(customer);
-        await _persistence.SaveChangesAsync();
+        var currentCustomer = await FindById(request.Id);
+
+        currentCustomer.CustomerName = request.CustomerName;
+        currentCustomer.Address = request.Address;
+        currentCustomer.MobilePhone = request.MobilePhone;
+        currentCustomer.Email = request.Email;
+
+        var customer = _uow.Repository<Customer>().Update(currentCustomer);
+        await _uow.SaveChangesAsync();
+        return customer.ConvertToCustomerResponse();
+    }
+
+    public async Task DeleteById(Guid id)
+    {
+        string[] includes = { "Account" };
+        var customer = await _uow.Repository<Customer>().FindAsync(c => c.Id == id, includes);
+        customer.Account.IsActive = false;
+        _uow.Repository<Customer>().Update(customer);
+        await _uow.SaveChangesAsync();
+
     }
 }

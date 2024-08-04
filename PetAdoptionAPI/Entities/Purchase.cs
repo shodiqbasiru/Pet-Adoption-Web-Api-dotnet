@@ -15,13 +15,9 @@ public class Purchase
     
     [Column(name:"customer_id")]
     public Guid CustomerId { get; set; }
+
+    public ICollection<PurchaseDetail> PurchaseDetails { get; set; } = null!; 
     
     [JsonIgnore]
-    public virtual Customer? Customer { get; set; } //foreign key
-    public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } // for one to many
+    public Customer? Customer { get; set; }
 }
-
-
-/*
- * virtual => penanda object relasi antara one to one ataupun one to many
- */

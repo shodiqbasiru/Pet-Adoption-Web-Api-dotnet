@@ -23,7 +23,6 @@ public static class ProductMapper
 
     public static List<ProductResponse> ConvertToProductResponses(this List<Product> products)
     {
-
         return products.Select(product => product.ConvertToProductResponse()).ToList();
     }
 }

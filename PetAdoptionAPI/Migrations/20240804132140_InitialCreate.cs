@@ -46,10 +46,10 @@ namespace PetAdoptionAPI.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    customername = table.Column<string>(name: "customer_name", type: "NVarchar(50)", nullable: true),
-                    address = table.Column<string>(type: "NVarchar(250)", nullable: false),
-                    mobilephone = table.Column<string>(name: "mobile_phone", type: "NVarchar(14)", nullable: false),
-                    email = table.Column<string>(type: "NVarchar(50)", nullable: false),
+                    customername = table.Column<string>(name: "customer_name", type: "Varchar(50)", nullable: true),
+                    address = table.Column<string>(type: "Varchar(250)", nullable: true),
+                    mobilephone = table.Column<string>(name: "mobile_phone", type: "Varchar(14)", nullable: true),
+                    email = table.Column<string>(type: "Varchar(50)", nullable: true),
                     accountid = table.Column<Guid>(name: "account_id", type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -115,17 +115,17 @@ namespace PetAdoptionAPI.Migrations
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     purchaseid = table.Column<Guid>(name: "purchase_id", type: "uniqueidentifier", nullable: false),
                     petid = table.Column<Guid>(name: "pet_id", type: "uniqueidentifier", nullable: false),
-                    qty = table.Column<long>(type: "bigint", nullable: false)
+                    qty = table.Column<long>(type: "bigint", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_t_purchase_detail", x => x.id);
                     table.ForeignKey(
-                        name: "FK_t_purchase_detail_m_product_pet_id",
-                        column: x => x.petid,
+                        name: "FK_t_purchase_detail_m_product_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "m_product",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_t_purchase_detail_t_purchase_purchase_id",
                         column: x => x.purchaseid,
@@ -137,7 +137,8 @@ namespace PetAdoptionAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_m_customer_account_id",
                 table: "m_customer",
-                column: "account_id");
+                column: "account_id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_m_product_category_id",
@@ -150,9 +151,9 @@ namespace PetAdoptionAPI.Migrations
                 column: "customer_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_t_purchase_detail_pet_id",
+                name: "IX_t_purchase_detail_ProductId",
                 table: "t_purchase_detail",
-                column: "pet_id");
+                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_t_purchase_detail_purchase_id",

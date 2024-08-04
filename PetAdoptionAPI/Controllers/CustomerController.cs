@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PetAdoptionAPI.Entities;
+using PetAdoptionAPI.Models.Requests;
 using PetAdoptionAPI.Models.Responses;
 using PetAdoptionAPI.Services;
 
@@ -36,7 +37,7 @@ public class CustomerController : ControllerBase
     public async Task<IActionResult> GetAllCustomers()
     {
         var customers = await _service.GetAll();
-        var responses = new CustomResponse<List<Customer>>
+        var responses = new CustomResponse<List<CustomerResponse>>
         {
             StatusCode = (int)HttpStatusCode.OK,
             Message = "Get All Data Successfully",
@@ -48,8 +49,8 @@ public class CustomerController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCustomerById(string id)
     {
-        var customer = await _service.GetById(id);
-        var response = new CustomResponse<Customer>
+        var customer = await _service.FindCustomerById(Guid.Parse(id));
+        var response = new CustomResponse<CustomerResponse>
         {
             StatusCode = (int)HttpStatusCode.OK,
             Message = "Get Data Successfully",
@@ -60,13 +61,13 @@ public class CustomerController : ControllerBase
 
 
     [HttpPut]
-    public async Task<IActionResult> UpdateCustomer([FromBody] Customer payload)
+    public async Task<IActionResult> UpdateCustomer([FromBody] CustomerUpdateRequest request)
     {
-        var customer = await _service.Update(payload);
-        var response = new CustomResponse<Customer>
+        var customer = await _service.Update(request);
+        var response = new CustomResponse<CustomerResponse>
         {
             StatusCode = (int)HttpStatusCode.OK,
-            Message = "Get All Data Successfully",
+            Message = "Updated Data Successfully",
             Data = customer
         };
         return Ok(response);
@@ -75,12 +76,11 @@ public class CustomerController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCustomer(string id)
     {
-        await _service.DeleteById(id);
-        var response = new CustomResponse<string?>
+        await _service.DeleteById(Guid.Parse(id));
+        var response = new CustomResponse<string>
         {
             StatusCode = (int)HttpStatusCode.OK,
             Message = "Deleted Data Successfully",
-            Data = null
         };
         return Ok(response);
     }
