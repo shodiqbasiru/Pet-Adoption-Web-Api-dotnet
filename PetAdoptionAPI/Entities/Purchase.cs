@@ -19,12 +19,6 @@ public class Purchase
     [JsonIgnore]
     public virtual Customer? Customer { get; set; } //foreign key
     public virtual ICollection<PurchaseDetail> PurchaseDetails { get; set; } // for one to many
-
-    public override string ToString()
-    {
-        return
-            $"{nameof(Id)}: {Id}, {nameof(TransDate)}: {TransDate}, {nameof(CustomerId)}: {CustomerId}, {nameof(Customer)}: {Customer}, {nameof(PurchaseDetails)}: {PurchaseDetails}";
-    }
 }
 
 

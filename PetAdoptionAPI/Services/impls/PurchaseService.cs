@@ -9,9 +9,9 @@ public class PurchaseService : IPurchaseService
 {
     private readonly IRepository<Purchase> _repository;
     private readonly IPersistence _persistence;
-    private readonly IPetService _petService;
+    private readonly IProductService _petService;
 
-    public PurchaseService(IRepository<Purchase> repository, IPersistence persistence, IPetService petService)
+    public PurchaseService(IRepository<Purchase> repository, IPersistence persistence, IProductService petService)
     {
         _repository = repository;
         _persistence = persistence;
@@ -39,7 +39,7 @@ public class PurchaseService : IPurchaseService
 
             foreach (var detail in purchase.PurchaseDetails)
             {
-                var pet = await _petService.GetById(detail.PetId.ToString());
+                var pet = await _petService.FindById(detail.PetId);
                 pet.Stock -= detail.Qty;
             }
 
@@ -86,7 +86,7 @@ public class PurchaseService : IPurchaseService
 
     public async Task<List<PurchaseResponse>> GetAllTransaction()
     {
-        var purchases = await _repository.FindAllAsync(new []{"PurchaseDetails"});
+        var purchases = await _repository.FindAllAsync(new[] { "PurchaseDetails" });
         return purchases.Select(purchase => new PurchaseResponse
         {
             Id = purchase.Id.ToString(),

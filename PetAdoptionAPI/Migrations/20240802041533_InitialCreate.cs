@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetAdoptionAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -28,17 +28,17 @@ namespace PetAdoptionAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "m_pet",
+                name: "m_category",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    petname = table.Column<string>(name: "pet_name", type: "NVarchar(50)", nullable: true),
-                    price = table.Column<long>(type: "bigint", nullable: false),
-                    stock = table.Column<int>(type: "int", nullable: false)
+                    categoryname = table.Column<string>(name: "category_name", type: "NVarchar(50)", nullable: false),
+                    createdat = table.Column<DateTime>(name: "created_at", type: "datetime2", nullable: false),
+                    updatedat = table.Column<DateTime>(name: "updated_at", type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_m_pet", x => x.id);
+                    table.PrimaryKey("PK_m_category", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -46,10 +46,10 @@ namespace PetAdoptionAPI.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    customername = table.Column<string>(name: "customer_name", type: "NVarchar(50)"),
-                    address = table.Column<string>(type: "NVarchar(250)"),
-                    mobilephone = table.Column<string>(name: "mobile_phone", type: "NVarchar(14)"),
-                    email = table.Column<string>(type: "NVarchar(50)"),
+                    customername = table.Column<string>(name: "customer_name", type: "NVarchar(50)", nullable: true),
+                    address = table.Column<string>(type: "NVarchar(250)", nullable: false),
+                    mobilephone = table.Column<string>(name: "mobile_phone", type: "NVarchar(14)", nullable: false),
+                    email = table.Column<string>(type: "NVarchar(50)", nullable: false),
                     accountid = table.Column<Guid>(name: "account_id", type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -59,6 +59,32 @@ namespace PetAdoptionAPI.Migrations
                         name: "FK_m_customer_m_account_account_id",
                         column: x => x.accountid,
                         principalTable: "m_account",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "m_product",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    productname = table.Column<string>(name: "product_name", type: "Varchar(100)", nullable: false),
+                    price = table.Column<decimal>(type: "decimal(20,0)", nullable: false),
+                    stock = table.Column<long>(type: "bigint", nullable: false),
+                    rating = table.Column<long>(type: "bigint", nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    url = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    createdat = table.Column<DateTime>(name: "created_at", type: "datetime2", nullable: false),
+                    updatedat = table.Column<DateTime>(name: "updated_at", type: "datetime2", nullable: false),
+                    categoryid = table.Column<Guid>(name: "category_id", type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_m_product", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_m_product_m_category_category_id",
+                        column: x => x.categoryid,
+                        principalTable: "m_category",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -89,15 +115,15 @@ namespace PetAdoptionAPI.Migrations
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     purchaseid = table.Column<Guid>(name: "purchase_id", type: "uniqueidentifier", nullable: false),
                     petid = table.Column<Guid>(name: "pet_id", type: "uniqueidentifier", nullable: false),
-                    qty = table.Column<int>(type: "int", nullable: false)
+                    qty = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_t_purchase_detail", x => x.id);
                     table.ForeignKey(
-                        name: "FK_t_purchase_detail_m_pet_pet_id",
+                        name: "FK_t_purchase_detail_m_product_pet_id",
                         column: x => x.petid,
-                        principalTable: "m_pet",
+                        principalTable: "m_product",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -112,6 +138,11 @@ namespace PetAdoptionAPI.Migrations
                 name: "IX_m_customer_account_id",
                 table: "m_customer",
                 column: "account_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_m_product_category_id",
+                table: "m_product",
+                column: "category_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_t_purchase_customer_id",
@@ -136,10 +167,13 @@ namespace PetAdoptionAPI.Migrations
                 name: "t_purchase_detail");
 
             migrationBuilder.DropTable(
-                name: "m_pet");
+                name: "m_product");
 
             migrationBuilder.DropTable(
                 name: "t_purchase");
+
+            migrationBuilder.DropTable(
+                name: "m_category");
 
             migrationBuilder.DropTable(
                 name: "m_customer");
