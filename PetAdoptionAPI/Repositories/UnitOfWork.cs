@@ -4,14 +4,18 @@ namespace PetAdoptionAPI.Repositories;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
-    public UnitOfWork(AppDbContext context)
+    private readonly IServiceProvider _provider;
+
+    public UnitOfWork(AppDbContext context, IServiceProvider provider)
     {
         _context = context;       
+        _provider = provider;
     }
 
     public IRepository<TEntity> Repository<TEntity>() where TEntity : class
     {
-        return new Repository<TEntity>(_context);
+        
+        return _provider.GetRequiredService<IRepository<TEntity>>();
     }
 
     public async Task<int> SaveChangesAsync()

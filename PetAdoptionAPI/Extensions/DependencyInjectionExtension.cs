@@ -16,8 +16,7 @@ public static class DependencyInjectionExtension
             {
                 builder.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             })
-            .AddScoped(typeof(IRepository<>), typeof(Repository<>))
-            .AddScoped<IPersistence, DbPersistence>();
+            .AddScoped(typeof(IRepository<>), typeof(Repository<>));
     }
 
     public static void AddServices(this IServiceCollection services)

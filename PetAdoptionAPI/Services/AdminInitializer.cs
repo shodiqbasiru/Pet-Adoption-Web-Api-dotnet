@@ -16,9 +16,8 @@ public class AdminInitializer : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = _serviceProvider.CreateScope();
-        var account = scope.ServiceProvider.GetRequiredService<IRepository<Account>>();
-        var persistence = scope.ServiceProvider.GetRequiredService<IPersistence>();
-        var admin = await account.FindAsync(admin => admin.Role == Role.Admin);
+        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        var admin = await uow.Repository<Account>().FindAsync(admin => admin.Role == Role.Admin);
         if (admin is null)
         {
 
@@ -32,8 +31,8 @@ public class AdminInitializer : IHostedService
                 IsActive = true,
                 CreatedAt = DateTime.Now
             };
-            await account.SaveAsync(adminAccount);
-            await persistence.SaveChangesAsync();
+            await uow.Repository<Account>().SaveAsync(adminAccount);
+            await uow.SaveChangesAsync();
         }
     }
 
