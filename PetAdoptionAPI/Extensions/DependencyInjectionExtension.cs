@@ -28,6 +28,7 @@ public static class DependencyInjectionExtension
             .AddScoped<IPurchaseService, PurchaseService>()
             .AddScoped<IAuthService, AuthService>()
             .AddScoped<ICategoryService, CategoryService>()
+            .AddScoped<IServicesService, ServicesService>()
             .AddScoped<IJwtUtils, JwtUtils>()
             .AddScoped<ExceptionHandlingMiddleware>();
     }
