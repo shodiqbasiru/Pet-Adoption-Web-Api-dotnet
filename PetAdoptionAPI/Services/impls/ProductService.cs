@@ -12,7 +12,6 @@ public class ProductService : IProductService
 
     private readonly IUnitOfWork _uow;
 
-
     public ProductService(IUnitOfWork uow)
     {
         _uow = uow;
@@ -21,6 +20,7 @@ public class ProductService : IProductService
     public async Task<ProductResponse> Create(ProductRequest request)
     {
         var category = await _uow.Repository<Category>().FindByIdAsync(request.CategoryId) ?? throw new NotFoundException("category not found");
+        var store = await _uow.Repository<Store>().FindByIdAsync(request.StoreId) ?? throw new NotFoundException("store not found");
 
         Product payload = new()
         {
@@ -32,7 +32,8 @@ public class ProductService : IProductService
             Url = request.Url,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
-            CategoryId = category.Id
+            CategoryId = category.Id,
+            StoreId = store.Id
         };
 
         var product = await _uow.Repository<Product>().SaveAsync(payload);
