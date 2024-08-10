@@ -36,5 +36,9 @@ public class Product
     [Column(name: "category_id")]
     public Guid CategoryId { get; set; }
 
+    [Column(name: "store_id")]
+    public Guid StoreId { get; set; }
+
     public Category Category { get; set; } = null!;
+    public Store Store { get; set; } = null!;
 }

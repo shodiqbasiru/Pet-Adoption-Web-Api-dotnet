@@ -13,6 +13,9 @@ public class Account
     [Column(name: "username")]
     public string Username { get; set; } = null!;
 
+    [Column(name: "email")]
+    public string? Email { get; set; }
+
     [Column(name: "password")]
     public string Password { get; set; } = null!;
 
@@ -25,5 +28,9 @@ public class Account
     [Column(name: "is_active")]
     public bool IsActive { get; set; }
 
+    [Column(name: "deleted_at")]
+    public DateTime? DeletedAt { get; set; }
+
     public Customer? Customer { get; set; }
+    public Store? Store { get; set; }
 }
