@@ -30,6 +30,20 @@ public class AuthController : ControllerBase
         
         return Created("/api/auth/register", response);
     }
+
+    [HttpPost("register-seller")]
+    public async Task<IActionResult> RegisterSeller([FromBody] RegisterSellerRequest request)
+    {
+        var seller = await _authService.RegisterSeller(request);
+        var response = new CustomResponse<RegisterSellerResponse>
+        {
+            StatusCode = (int)HttpStatusCode.Created,
+            Message = "Register Seller Successfully",
+            Data = seller
+        };
+        
+        return Created("/api/auth/register-seller", response);
+    }
     
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
