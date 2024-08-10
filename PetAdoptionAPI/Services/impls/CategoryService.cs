@@ -4,7 +4,7 @@ using PetAdoptionAPI.Models.Requests;
 using PetAdoptionAPI.Models.Responses;
 using PetAdoptionAPI.Repositories;
 
-namespace PetAdoptionAPI.Services;
+namespace PetAdoptionAPI.Services.impls;
 
 public class CategoryService : ICategoryService
 {
