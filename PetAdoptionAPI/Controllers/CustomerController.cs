@@ -19,20 +19,7 @@ public class CustomerController : ControllerBase
     {
         _service = service;
     }
-
-    [HttpPost]
-    public async Task<IActionResult> CreateNewCustomer([FromBody] Customer payload)
-    {
-        var customer = await _service.Create(payload);
-        var response = new CustomResponse<Customer>
-        {
-            StatusCode = (int)HttpStatusCode.Created,
-            Message = "Created Data Successfully",
-            Data = customer
-        };
-        return Created("/api/customers", response);
-    }
-
+    
     [HttpGet]
     public async Task<IActionResult> GetAllCustomers()
     {
