@@ -20,7 +20,10 @@ public class ExceptionHandlingMiddleware : IMiddleware
         try
         {
             var path = context.Request.Path;
-            if (path.StartsWithSegments("/api/auth/login") || path.StartsWithSegments("/api/auth/register"))
+            if (
+                path.StartsWithSegments("/api/auth/login") || 
+                path.StartsWithSegments("/api/auth/register") ||
+                path.StartsWithSegments("/api/auth/register-seller"))
             {
                 await next(context);
                 return;
