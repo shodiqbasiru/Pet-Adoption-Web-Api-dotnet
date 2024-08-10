@@ -12,4 +12,5 @@ public class ProductRequest
     public string? Description { get; set; }
     public string? Url { get; set; }
     public Guid CategoryId { get; set; }
+    public Guid StoreId { get; set; }
 }
