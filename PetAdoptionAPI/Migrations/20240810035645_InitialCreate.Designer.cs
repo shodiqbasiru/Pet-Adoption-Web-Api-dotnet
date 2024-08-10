@@ -12,7 +12,7 @@ using PetAdoptionAPI.Repositories;
 namespace PetAdoptionAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240804132140_InitialCreate")]
+    [Migration("20240810035645_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -35,6 +35,14 @@ namespace PetAdoptionAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("email");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit")
@@ -156,6 +164,10 @@ namespace PetAdoptionAPI.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("stock");
 
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("store_id");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
@@ -167,6 +179,8 @@ namespace PetAdoptionAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
+
+                    b.HasIndex("StoreId");
 
                     b.ToTable("m_product");
                 });
@@ -182,13 +196,24 @@ namespace PetAdoptionAPI.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("customer_id");
 
+                    b.Property<Guid>("ServiceId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("service_id");
+
                     b.Property<DateTime>("TransDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("trans_date");
 
+                    b.Property<string>("TransType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("trans_type");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("ServiceId");
 
                     b.ToTable("t_purchase");
                 });
@@ -224,6 +249,83 @@ namespace PetAdoptionAPI.Migrations
                     b.ToTable("t_purchase_detail");
                 });
 
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Service", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint")
+                        .HasColumnName("price");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("service_name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("m_service");
+                });
+
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Store", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("address");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<long>("Rating")
+                        .HasColumnType("bigint")
+                        .HasColumnName("rating");
+
+                    b.Property<string>("StoreName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("store_name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId")
+                        .IsUnique();
+
+                    b.ToTable("m_store");
+                });
+
             modelBuilder.Entity("PetAdoptionAPI.Entities.Customer", b =>
                 {
                     b.HasOne("PetAdoptionAPI.Entities.Account", "Account")
@@ -243,7 +345,15 @@ namespace PetAdoptionAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PetAdoptionAPI.Entities.Store", "Store")
+                        .WithMany("Products")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("PetAdoptionAPI.Entities.Purchase", b =>
@@ -254,7 +364,15 @@ namespace PetAdoptionAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PetAdoptionAPI.Entities.Service", "Service")
+                        .WithMany("Purchases")
+                        .HasForeignKey("ServiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Customer");
+
+                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("PetAdoptionAPI.Entities.PurchaseDetail", b =>
@@ -274,9 +392,22 @@ namespace PetAdoptionAPI.Migrations
                     b.Navigation("Purchase");
                 });
 
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Store", b =>
+                {
+                    b.HasOne("PetAdoptionAPI.Entities.Account", "Account")
+                        .WithOne("Store")
+                        .HasForeignKey("PetAdoptionAPI.Entities.Store", "AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
             modelBuilder.Entity("PetAdoptionAPI.Entities.Account", b =>
                 {
                     b.Navigation("Customer");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("PetAdoptionAPI.Entities.Category", b =>
@@ -292,6 +423,16 @@ namespace PetAdoptionAPI.Migrations
             modelBuilder.Entity("PetAdoptionAPI.Entities.Purchase", b =>
                 {
                     b.Navigation("PurchaseDetails");
+                });
+
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Service", b =>
+                {
+                    b.Navigation("Purchases");
+                });
+
+            modelBuilder.Entity("PetAdoptionAPI.Entities.Store", b =>
+                {
+                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }
