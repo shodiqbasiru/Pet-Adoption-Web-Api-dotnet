@@ -1,14 +1,11 @@
 using System.Net;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PetAdoptionAPI.Entities;
 using PetAdoptionAPI.Models.Requests;
 using PetAdoptionAPI.Models.Responses;
 using PetAdoptionAPI.Services;
 
 namespace PetAdoptionAPI.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/products")]
 public class ProductController : ControllerBase

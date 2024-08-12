@@ -29,7 +29,7 @@ public class JwtUtils : IJwtUtils
                 new(ClaimTypes.Name, account.Username),
                 new(ClaimTypes.Role, account.Role.ToString())
             },
-            expires: DateTime.Now.AddMinutes(30),
+            expires: DateTime.Now.AddMinutes(60),
             signingCredentials: credentials);
         
         return new JwtSecurityTokenHandler().WriteToken(securityToken);

@@ -19,73 +19,55 @@ public class ExceptionHandlingMiddleware : IMiddleware
     {
         try
         {
-            var path = context.Request.Path;
-            if (
-                path.StartsWithSegments("/api/auth/login") || 
-                path.StartsWithSegments("/api/auth/register") ||
-                path.StartsWithSegments("/api/auth/register-seller"))
+            var allowPaths = new List<string>
+            {
+                "/api/auth/login",
+                "/api/auth/register",
+                "/api/auth/register-seller"
+            };
+
+            var path = context.Request.Path.Value!.ToLower();
+            if (allowPaths.Contains(path))
             {
                 await next(context);
                 return;
             }
-            
-            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-            if (authHeader == null)
+
+            if(!context.User.Identity!.IsAuthenticated)
             {
-                throw new UnauthorizedException("Full authentication is required to access this resource");
+                throw new AuthenticationException("User is not authenticated");
             }
             await next(context);
+    
         }
         catch (Exception e)
         {
+            _logger.LogError("Error occurred: {}", e);
+            
             await HandlingExceptionAsync(context, e);
         }
     }
 
     private static async Task HandlingExceptionAsync(HttpContext context, Exception exception)
     {
-        var error = new ErrorResponse();
-        switch (exception)
+        context.Response.ContentType = "application/json";
+        var statusCode = exception switch
         {
-            case NotFoundException:
-                error.Code = (int)HttpStatusCode.NotFound;
-                error.Status = HttpStatusCode.NotFound.ToString();
-                error.Message = exception.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                break;
-            case UnauthorizedException:
-                error.Code = (int)HttpStatusCode.Unauthorized;
-                error.Status = HttpStatusCode.Unauthorized.ToString();
-                error.Message = exception.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                break;
-            case AuthenticationException:
-                error.Code = (int)HttpStatusCode.Unauthorized;
-                error.Status = HttpStatusCode.Unauthorized.ToString();
-                error.Message = exception.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                break;
-            case AuthorizationException:
-                error.Code = (int)HttpStatusCode.Forbidden;
-                error.Status = HttpStatusCode.Forbidden.ToString();
-                error.Message = exception.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-                break;
-            case BadRequestException:
-                error.Code = (int)HttpStatusCode.BadRequest;
-                error.Status = HttpStatusCode.BadRequest.ToString();
-                error.Message = exception.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                break;
-            case DuplicateDataException:
-                error.Code = (int)HttpStatusCode.Conflict;
-                error.Status = HttpStatusCode.Conflict.ToString();
-                error.Message = exception.Message;
-                context.Response.StatusCode = (int)HttpStatusCode.Conflict;
-                break;
-            case not null:
-                break;
-        }
+            NotFoundException => (int)HttpStatusCode.NotFound,
+            UnauthorizedException => (int)HttpStatusCode.Unauthorized,
+            AuthenticationException => (int)HttpStatusCode.Unauthorized,
+            AuthorizationException => (int)HttpStatusCode.Forbidden,
+            BadRequestException => (int)HttpStatusCode.BadRequest,
+            DuplicateDataException => (int)HttpStatusCode.Conflict,
+            _ => (int)HttpStatusCode.InternalServerError
+        };
+
+        context.Response.StatusCode = statusCode;
+        var error = new ErrorResponse{
+            StatusCode = statusCode,
+            Message = exception.Message
+        };
+       
 
         await context.Response.WriteAsJsonAsync(error);
     }

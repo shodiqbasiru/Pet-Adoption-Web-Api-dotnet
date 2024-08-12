@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using PetAdoptionAPI.Middlewares;
 using PetAdoptionAPI.Repositories;
@@ -30,12 +31,11 @@ public static class DependencyInjectionExtension
             .AddScoped<ICategoryService, CategoryService>()
             .AddScoped<IServicesService, ServicesService>()
             .AddScoped<IStoreService, StoreService>()
-            .AddScoped<IJwtUtils, JwtUtils>()
-            .AddScoped<ExceptionHandlingMiddleware>();
+            .AddScoped<IJwtUtils, JwtUtils>();
     }
 
     public static void AddMiddlewares(this IServiceCollection service)
     {
-        service.AddScoped<ExceptionHandlingMiddleware>();
+        service.AddSingleton<ExceptionHandlingMiddleware>();
     }
 }

@@ -26,5 +26,5 @@ public class Customer
     
 
     public Account? Account { get; set; }
-    public ICollection<Purchase>? Purchases {get;set;}
+    public List<Purchase>? Purchases {get;set;}
 }

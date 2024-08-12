@@ -9,7 +9,11 @@ public static class SecurityExtension
 {
     public static void AddJwtAuthentication(this IServiceCollection service, IConfiguration configuration)
     {
-        service.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        service.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(opt =>
             {
                 var jwtIssuer = configuration.GetSection("Jwt:Issuer").Get<string>();
@@ -60,5 +64,5 @@ public static class SecurityExtension
             });
         });
     }
-    
+
 }

@@ -12,11 +12,11 @@ builder.Host.ConfigureLogging(logging =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHostedService<AdminInitializer>();
-builder.Services.AddJwtSwaggerAuthentication();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+builder.Services.AddJwtSwaggerAuthentication();
 builder.Services.AddJwtAuthentication(builder.Configuration); // Inject the JwtAuthentication
 builder.Services.AddRepositories(builder.Configuration); // Inject the repositories
-builder.Services.AddServices(); // Inject the services
 builder.Services.AddMiddlewares();
+builder.Services.AddServices(); // Inject the services
 
 var app = builder.Build();
 

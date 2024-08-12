@@ -4,7 +4,7 @@ namespace PetAdoptionAPI.Models.Responses;
 
 public class ErrorResponse
 {
-    public int Code { get; set; } = (int)HttpStatusCode.InternalServerError;
-    public string Status { get; set; } = HttpStatusCode.InternalServerError.ToString();
-    public string Message { get; set; } = "Internal Server Error";
+    public int StatusCode { get; set; }
+    public string Message { get; set; } = null!;
+    public object Errors { get; set; } = null!;
 }
