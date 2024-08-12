@@ -26,6 +26,14 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 "/api/auth/register-seller"
             };
 
+            // var token = context.Request.Headers["Authorization"].ToString();
+            // if (token.StartsWith("Bearer "))
+            // {
+            //     token = token[7..];
+            // }
+
+            // _logger.LogInformation("Token: {}", token);
+
             var path = context.Request.Path.Value!.ToLower();
             if (allowPaths.Contains(path))
             {
@@ -33,17 +41,18 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 return;
             }
 
-            if(!context.User.Identity!.IsAuthenticated)
+            if (!context.User.Identity.IsAuthenticated)
             {
                 throw new AuthenticationException("User is not authenticated");
             }
+
             await next(context);
-    
+
         }
         catch (Exception e)
         {
             _logger.LogError("Error occurred: {}", e);
-            
+
             await HandlingExceptionAsync(context, e);
         }
     }
@@ -53,21 +62,22 @@ public class ExceptionHandlingMiddleware : IMiddleware
         context.Response.ContentType = "application/json";
         var statusCode = exception switch
         {
-            NotFoundException => (int)HttpStatusCode.NotFound,
-            UnauthorizedException => (int)HttpStatusCode.Unauthorized,
-            AuthenticationException => (int)HttpStatusCode.Unauthorized,
-            AuthorizationException => (int)HttpStatusCode.Forbidden,
-            BadRequestException => (int)HttpStatusCode.BadRequest,
-            DuplicateDataException => (int)HttpStatusCode.Conflict,
-            _ => (int)HttpStatusCode.InternalServerError
+            NotFoundException => StatusCodes.Status404NotFound,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
+            AuthenticationException => StatusCodes.Status401Unauthorized,
+            AuthorizationException => StatusCodes.Status403Forbidden,
+            BadRequestException => StatusCodes.Status400BadRequest,
+            DuplicateDataException => StatusCodes.Status409Conflict,
+            _ => StatusCodes.Status500InternalServerError
         };
 
         context.Response.StatusCode = statusCode;
-        var error = new ErrorResponse{
+        var error = new ErrorResponse
+        {
             StatusCode = statusCode,
             Message = exception.Message
         };
-       
+
 
         await context.Response.WriteAsJsonAsync(error);
     }

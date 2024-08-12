@@ -10,7 +10,7 @@ namespace PetAdoptionAPI.Controllers;
 [ApiController]
 [Route("api/categories")]
 public class CategoryController : ControllerBase
-{   
+{
 
     private readonly ICategoryService _categoryService;
     public CategoryController(ICategoryService categoryService)
@@ -33,9 +33,10 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllCategory(){
+    public async Task<IActionResult> GetAllCategory()
+    {
         var categories = await _categoryService.GetAllCategory();
-        CustomResponse<IEnumerable<CategoryResponse>> responses = new ()
+        CustomResponse<IEnumerable<CategoryResponse>> responses = new()
         {
             StatusCode = (int)HttpStatusCode.OK,
             Message = "Get All Data Successfully",
@@ -48,7 +49,7 @@ public class CategoryController : ControllerBase
     [HttpGet("{categoryId}")]
     public async Task<IActionResult> GetCategoryById(string categoryId)
     {
-        var category = await _categoryService.GetById(Guid.Parse(categoryId));
+        var category = await _categoryService.GetById(categoryId);
         CustomResponse<Category> response = new()
         {
             StatusCode = (int)HttpStatusCode.OK,
@@ -59,7 +60,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateCategory([FromBody] CategoryUpdateRequest request)
+    public async Task<IActionResult> UpdateCategory([FromBody] CategoryRequest request)
     {
         var category = await _categoryService.UpdateCategory(request);
         CustomResponse<Category> response = new()
@@ -75,7 +76,7 @@ public class CategoryController : ControllerBase
     [HttpDelete("{categoryId}")]
     public async Task<IActionResult> DeleteCategory(string categoryId)
     {
-        await _categoryService.DeleteById(Guid.Parse(categoryId));
+        await _categoryService.DeleteById(categoryId);
         CustomResponse<Category> response = new()
         {
             StatusCode = (int)HttpStatusCode.OK,

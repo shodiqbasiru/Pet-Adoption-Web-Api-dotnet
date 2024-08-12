@@ -28,6 +28,7 @@ builder.Services.AddJwtAuthentication(builder.Configuration); // Inject the JwtA
 builder.Services.AddRepositories(builder.Configuration); // Inject the repositories
 builder.Services.AddMiddlewares();
 builder.Services.AddServices(); // Inject the services
+// builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -38,13 +39,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 

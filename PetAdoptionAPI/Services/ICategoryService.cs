@@ -7,8 +7,9 @@ namespace PetAdoptionAPI.Services;
 public interface ICategoryService
 {
     Task<Category> Create(CategoryRequest request);
-    Task<Category> GetById(Guid id);
+    Task<Category> GetById(string id);
+    Task<CategoryResponse> GetCategoryById(string id);
     Task<IEnumerable<CategoryResponse>> GetAllCategory();
-    Task<Category> UpdateCategory(CategoryUpdateRequest request);
-    Task DeleteById(Guid id);
+    Task<Category> UpdateCategory(CategoryRequest request);
+    Task DeleteById(string id);
 }

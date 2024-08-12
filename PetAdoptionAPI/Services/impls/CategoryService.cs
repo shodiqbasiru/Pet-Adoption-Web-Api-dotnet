@@ -16,13 +16,13 @@ public class CategoryService : ICategoryService
 
     public async Task<Category> Create(CategoryRequest request)
     {
-        Category payload = new ()
+        Category payload = new()
         {
             CategoryName = request.CategoryName,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now
         };
-        
+
         var category = await _uow.Repository<Category>().SaveAsync(payload);
         await _uow.SaveChangesAsync();
         return category;
@@ -30,9 +30,9 @@ public class CategoryService : ICategoryService
 
     public async Task<IEnumerable<CategoryResponse>> GetAllCategory()
     {
-        string[] includes = {"Products"};
+        string[] includes = { "Products" };
         var categories = await _uow.Repository<Category>().FindAllAsync(includes);
-        
+
         var categoryResponses = categories.Select(category => new CategoryResponse()
         {
             Id = category.Id,
@@ -52,14 +52,20 @@ public class CategoryService : ICategoryService
 
     }
 
-    public async Task<Category> GetById(Guid id)
+    public async Task<Category> GetById(string id)
     {
-        return await _uow.Repository<Category>().FindByIdAsync(id) ?? throw new NotFoundException("category not found");
-    }   
+        if(!Guid.TryParse(id, out Guid categoryId)) throw new NotFoundException("category not found");
+        return await _uow.Repository<Category>().FindByIdAsync(categoryId) ?? throw new NotFoundException("category not found");
+    }
 
-    public async Task<Category> UpdateCategory(CategoryUpdateRequest request)
+    public Task<CategoryResponse> GetCategoryById(string id)
     {
-        var category = await GetById(request.Id);
+        throw new NotImplementedException();
+    }
+
+    public async Task<Category> UpdateCategory(CategoryRequest request)
+    {
+        var category = await GetById(request.Id ?? throw new BadRequestException("Category id is required"));
         category.CategoryName = request.CategoryName;
         category.UpdatedAt = DateTime.Now;
 
@@ -68,10 +74,11 @@ public class CategoryService : ICategoryService
         return newCategery;
     }
 
-    public async Task DeleteById(Guid id)
+    public async Task DeleteById(string id)
     {
         var category = await GetById(id);
         _uow.Repository<Category>().Delete(category);
         await _uow.SaveChangesAsync();
     }
+
 }

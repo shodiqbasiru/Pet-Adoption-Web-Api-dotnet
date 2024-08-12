@@ -4,9 +4,9 @@ namespace PetAdoptionAPI.Models.Requests;
 
 public class LoginRequest
 {
-    [Required, MinLength(6)]
+    [Required, MinLength(5)]
     public string Username { get; set; } = null!;
 
-    [Required, MinLength(6)]
+    [Required, MinLength(5)]
     public string Password { get; set; } = null!;
 }
