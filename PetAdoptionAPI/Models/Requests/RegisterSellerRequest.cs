@@ -5,7 +5,7 @@ namespace PetAdoptionAPI.Models.Requests;
 
 public class RegisterSellerRequest
 {
-    [Required]
+    [Required, MinLength(6)]
     public string Username { get; set; } = null!;
 
     [Required, EmailAddress]
@@ -14,9 +14,9 @@ public class RegisterSellerRequest
     [Required] 
     public string Password { get; set; } = null!;
 
-    [Required]
+    [Required, MinLength(3)]
     public string StoreName { get; set; } = null!;
     
-    [Required]
+    [Required, MinLength(10)]
     public string Address { get; set; } = null!;
 }

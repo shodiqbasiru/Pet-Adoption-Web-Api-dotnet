@@ -7,7 +7,7 @@ public class ServiceRequest
 {
     public string? Id { get; set; }
     
-    [Required(ErrorMessage = "Service name is required")]
+    [Required(ErrorMessage = "Service name is required"), MinLength(3)]
     public string ServiceName { get; set; } = null!;
 
     public string? Description { get; set; }

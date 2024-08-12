@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using PetAdoptionAPI.Extensions;
+using PetAdoptionAPI.filters;
 using PetAdoptionAPI.Middlewares;
 using PetAdoptionAPI.Services;
 
@@ -9,7 +11,16 @@ builder.Host.ConfigureLogging(logging =>
     logging.AddConsole();
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(config =>
+{
+    config.Filters.Add<ValidateEntityFilter>();
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHostedService<AdminInitializer>();
 builder.Services.AddJwtSwaggerAuthentication();
