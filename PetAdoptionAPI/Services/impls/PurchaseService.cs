@@ -36,7 +36,7 @@ public class PurchaseService : IPurchaseService
 
              foreach (var detail in purchase.PurchaseDetails)
              {
-                 var pet = await _productService.FindById(detail.PetId);
+                 var pet = await _productService.FindById(detail.PetId.ToString());
                  pet.Stock -= detail.Qty;
              }
 

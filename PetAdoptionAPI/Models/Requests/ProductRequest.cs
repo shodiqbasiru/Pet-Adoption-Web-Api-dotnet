@@ -4,6 +4,8 @@ namespace PetAdoptionAPI.Models.Requests;
 
 public class ProductRequest
 {
+    public string? Id { get; set; }
+
     [Required, MinLength(3)]
     public string ProductName { get; set; } = null!;
 
@@ -20,6 +22,6 @@ public class ProductRequest
     
     public string? Url { get; set; }
     
-    public Guid CategoryId { get; set; }
-    public Guid StoreId { get; set; }
+    public string? CategoryId { get; set; }
+    public string? StoreId { get; set; }
 }

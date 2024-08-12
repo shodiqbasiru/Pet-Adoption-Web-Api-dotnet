@@ -11,16 +11,19 @@ public class ProductService : IProductService
 {
 
     private readonly IUnitOfWork _uow;
+    private readonly ICategoryService _categoryService;
+    private readonly IStoreService _storeService;
 
-    public ProductService(IUnitOfWork uow)
+    public ProductService(IUnitOfWork uow, ICategoryService categoryService, IStoreService storeService)
     {
         _uow = uow;
+        _categoryService = categoryService;
+        _storeService = storeService;
     }
-
     public async Task<ProductResponse> Create(ProductRequest request)
     {
-        var category = await _uow.Repository<Category>().FindByIdAsync(request.CategoryId) ?? throw new NotFoundException("category not found");
-        var store = await _uow.Repository<Store>().FindByIdAsync(request.StoreId) ?? throw new NotFoundException("store not found");
+        var category = await _categoryService.GetById(request.CategoryId!);
+        var store = await _storeService.FindById(request.StoreId!);
 
         Product payload = new()
         {
@@ -41,12 +44,13 @@ public class ProductService : IProductService
         return product.ConvertToProductResponse();
     }
 
-    public async Task<Product> FindById(Guid id)
+    public async Task<Product> FindById(string id)
     {
-        return await _uow.Repository<Product>().FindByIdAsync(id) ?? throw new NotFoundException("pet not found");
+        if (!Guid.TryParse(id, out Guid productId)) throw new NotFoundException("product not found");
+        return await _uow.Repository<Product>().FindByIdAsync(productId) ?? throw new NotFoundException("product not found");
     }
 
-    public async Task<ProductResponse> FindProductById(Guid id)
+    public async Task<ProductResponse> FindProductById(string id)
     {
         var product = await FindById(id);
         return product.ConvertToProductResponse();
@@ -58,9 +62,9 @@ public class ProductService : IProductService
         return products.ConvertToProductResponses();
     }
 
-    public async Task<ProductResponse> Update(ProductUpdateRequest request)
+    public async Task<ProductResponse> Update(ProductRequest request)
     {
-        var currentProduct = await FindById(request.Id);
+        var currentProduct = await FindById(request.Id ?? throw new BadRequestException("Id is required"));
         currentProduct.ProductName = request.ProductName;
         currentProduct.Price = request.Price;
         currentProduct.Stock = request.Stock;
@@ -74,7 +78,7 @@ public class ProductService : IProductService
         return product.ConvertToProductResponse();
     }
 
-    public async Task DeleteById(Guid id)
+    public async Task DeleteById(string id)
     {
         var pet = await FindById(id);
         _uow.Repository<Product>().Delete(pet);
