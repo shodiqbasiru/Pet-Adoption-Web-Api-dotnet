@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace PetAdoption.Repositories;
+namespace PetAdoption.Infrastructure.Interfaces;
 
 public interface IRepository<TEntity>
 {

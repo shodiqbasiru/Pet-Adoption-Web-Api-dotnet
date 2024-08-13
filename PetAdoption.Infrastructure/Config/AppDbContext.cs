@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PetAdoption.Core.Constants;
 using PetAdoption.Core.Entities;
 
-namespace PetAdoption.Repositories;
+namespace PetAdoption.Infrastructure.Config;
 
 public class AppDbContext : DbContext
 {

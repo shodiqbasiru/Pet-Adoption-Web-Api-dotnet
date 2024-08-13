@@ -1,4 +1,4 @@
-namespace PetAdoption.Repositories;
+namespace PetAdoption.Infrastructure.Interfaces;
 
 public interface IUnitOfWork
 {
