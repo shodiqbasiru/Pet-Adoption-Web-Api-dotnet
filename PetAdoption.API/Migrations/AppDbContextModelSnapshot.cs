@@ -246,6 +246,46 @@ namespace PetAdoption.API.Migrations
                     b.ToTable("t_purchase_detail");
                 });
 
+            modelBuilder.Entity("PetAdoption.Core.Entities.Review", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("comment");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("customer_id");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("product_id");
+
+                    b.Property<long>("Rating")
+                        .HasColumnType("bigint")
+                        .HasColumnName("rating");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("m_review");
+                });
+
             modelBuilder.Entity("PetAdoption.Core.Entities.Service", b =>
                 {
                     b.Property<Guid>("Id")
@@ -389,6 +429,25 @@ namespace PetAdoption.API.Migrations
                     b.Navigation("Purchase");
                 });
 
+            modelBuilder.Entity("PetAdoption.Core.Entities.Review", b =>
+                {
+                    b.HasOne("PetAdoption.Core.Entities.Customer", "Customer")
+                        .WithMany("Reviews")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PetAdoption.Core.Entities.Product", "Product")
+                        .WithMany("Reviews")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("PetAdoption.Core.Entities.Store", b =>
                 {
                     b.HasOne("PetAdoption.Core.Entities.Account", "Account")
@@ -415,6 +474,13 @@ namespace PetAdoption.API.Migrations
             modelBuilder.Entity("PetAdoption.Core.Entities.Customer", b =>
                 {
                     b.Navigation("Purchases");
+
+                    b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("PetAdoption.Core.Entities.Product", b =>
+                {
+                    b.Navigation("Reviews");
                 });
 
             modelBuilder.Entity("PetAdoption.Core.Entities.Purchase", b =>

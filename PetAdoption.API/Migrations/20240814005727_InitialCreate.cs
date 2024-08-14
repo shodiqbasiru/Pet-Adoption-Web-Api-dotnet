@@ -164,6 +164,35 @@ namespace PetAdoption.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "m_review",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    rating = table.Column<long>(type: "bigint", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    product_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_m_review", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_m_review_m_customer_customer_id",
+                        column: x => x.customer_id,
+                        principalTable: "m_customer",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_m_review_m_product_product_id",
+                        column: x => x.product_id,
+                        principalTable: "m_product",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "t_purchase_detail",
                 columns: table => new
                 {
@@ -206,6 +235,16 @@ namespace PetAdoption.API.Migrations
                 column: "store_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_m_review_customer_id",
+                table: "m_review",
+                column: "customer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_m_review_product_id",
+                table: "m_review",
+                column: "product_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_m_store_account_id",
                 table: "m_store",
                 column: "account_id",
@@ -234,6 +273,9 @@ namespace PetAdoption.API.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "m_review");
+
             migrationBuilder.DropTable(
                 name: "t_purchase_detail");
 

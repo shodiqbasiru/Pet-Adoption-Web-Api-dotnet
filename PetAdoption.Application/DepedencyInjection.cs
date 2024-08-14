@@ -16,6 +16,7 @@ public static class DepedencyInjection
                 .AddScoped<ICategoryService, CategoryService>()
                 .AddScoped<IServicesService, ServicesService>()
                 .AddScoped<IStoreService, StoreService>()
+                .AddScoped<IReviewService, ReviewService>()
                 .AddScoped<IJwtUtils, JwtUtils>();
     }
 }

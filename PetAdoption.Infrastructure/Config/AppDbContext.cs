@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<PurchaseDetail> PurchaseDetails => Set<PurchaseDetail>();
     public DbSet<Store> Stores => Set<Store>();
     public DbSet<Service> Services => Set<Service>();
+    public DbSet<Review> Reviews => Set<Review>();
 
     protected AppDbContext()
     {
@@ -73,6 +74,20 @@ public class AppDbContext : DbContext
         .HasMany(s => s.Purchases)
         .WithOne(p => p.Service)
         .HasForeignKey(p => p.ServiceId);
+
+        // relationship between Review and Product => 1 Product can have many Reviews
+        modelBuilder.Entity<Review>()
+        .HasOne(r => r.Product)
+        .WithMany(p => p.Reviews)
+        .HasForeignKey(r => r.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+        // relationship between Review and Customer => 1 Customer can have many Reviews
+        modelBuilder.Entity<Review>()
+        .HasOne(r => r.Customer)
+        .WithMany(c => c.Reviews)
+        .HasForeignKey(r => r.CustomerId)
+        .OnDelete(DeleteBehavior.Restrict);
 
         // convert enum to string
         modelBuilder.Entity<Account>()

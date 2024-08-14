@@ -36,7 +36,7 @@ public class CustomerController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCustomerById(string id)
     {
-        var customer = await _service.FindCustomerById(Guid.Parse(id));
+        var customer = await _service.FindCustomerById(id);
         var response = new CustomResponse<CustomerResponse>
         {
             StatusCode = (int)HttpStatusCode.OK,
@@ -63,7 +63,7 @@ public class CustomerController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCustomer(string id)
     {
-        await _service.DeleteById(Guid.Parse(id));
+        await _service.DeleteById(id);
         var response = new CustomResponse<string>
         {
             StatusCode = (int)HttpStatusCode.OK,
