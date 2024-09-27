@@ -9,12 +9,12 @@ namespace PetAdoption.API.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/purchases")]
-public class PurchaseController : ControllerBase
+[Route("api/orders")]
+public class OrderController : ControllerBase
 {
     private readonly IOrderService _orderService;
 
-    public PurchaseController(IOrderService orderService)
+    public OrderController(IOrderService orderService)
     {
         _orderService = orderService;
     }
@@ -23,7 +23,7 @@ public class PurchaseController : ControllerBase
     public async Task<IActionResult> CreateTransaction([FromBody] OrderRequest request)
     {
         OrderResponse order = await _orderService.CreateTransaction(request);
-        return Created("/api/purchases", order);
+        return Created("/api/orders", order);
     }
     
     [HttpGet]
