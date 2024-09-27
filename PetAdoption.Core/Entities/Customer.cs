@@ -26,6 +26,6 @@ public class Customer
 
 
     public Account? Account { get; set; }
-    public List<Purchase>? Purchases { get; set; }
+    public List<Order>? Orders { get; set; }
     public List<Review>? Reviews { get; set; }
 }

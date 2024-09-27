@@ -11,10 +11,9 @@ public static class DepedencyInjection
         return services
                 .AddScoped<IProductService, ProductService>()
                 .AddScoped<ICustomerService, CustomerService>()
-                .AddScoped<IPurchaseService, PurchaseService>()
+                .AddScoped<IOrderService, OrderService>()
                 .AddScoped<IAuthService, AuthService>()
                 .AddScoped<ICategoryService, CategoryService>()
-                .AddScoped<IServicesService, ServicesService>()
                 .AddScoped<IStoreService, StoreService>()
                 .AddScoped<IReviewService, ReviewService>()
                 .AddScoped<IJwtUtils, JwtUtils>();

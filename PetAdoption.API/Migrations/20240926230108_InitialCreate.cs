@@ -42,23 +42,6 @@ namespace PetAdoption.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "m_service",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    service_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    price = table.Column<long>(type: "bigint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_m_service", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "m_customer",
                 columns: table => new
                 {
@@ -104,28 +87,20 @@ namespace PetAdoption.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "t_purchase",
+                name: "t_order",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     trans_date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    trans_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    service_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    customer_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_t_purchase", x => x.id);
+                    table.PrimaryKey("PK_t_order", x => x.id);
                     table.ForeignKey(
-                        name: "FK_t_purchase_m_customer_customer_id",
+                        name: "FK_t_order_m_customer_customer_id",
                         column: x => x.customer_id,
                         principalTable: "m_customer",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_t_purchase_m_service_service_id",
-                        column: x => x.service_id,
-                        principalTable: "m_service",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -193,29 +168,29 @@ namespace PetAdoption.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "t_purchase_detail",
+                name: "t_order_detail",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    purchase_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    pet_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    qty = table.Column<long>(type: "bigint", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    order_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    product_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    qty = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_t_purchase_detail", x => x.id);
+                    table.PrimaryKey("PK_t_order_detail", x => x.id);
                     table.ForeignKey(
-                        name: "FK_t_purchase_detail_m_product_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_t_order_detail_m_product_product_id",
+                        column: x => x.product_id,
                         principalTable: "m_product",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_t_purchase_detail_t_purchase_purchase_id",
-                        column: x => x.purchase_id,
-                        principalTable: "t_purchase",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_t_order_detail_t_order_order_id",
+                        column: x => x.order_id,
+                        principalTable: "t_order",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -251,24 +226,19 @@ namespace PetAdoption.API.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_t_purchase_customer_id",
-                table: "t_purchase",
+                name: "IX_t_order_customer_id",
+                table: "t_order",
                 column: "customer_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_t_purchase_service_id",
-                table: "t_purchase",
-                column: "service_id");
+                name: "IX_t_order_detail_order_id",
+                table: "t_order_detail",
+                column: "order_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_t_purchase_detail_ProductId",
-                table: "t_purchase_detail",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_t_purchase_detail_purchase_id",
-                table: "t_purchase_detail",
-                column: "purchase_id");
+                name: "IX_t_order_detail_product_id",
+                table: "t_order_detail",
+                column: "product_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -277,13 +247,13 @@ namespace PetAdoption.API.Migrations
                 name: "m_review");
 
             migrationBuilder.DropTable(
-                name: "t_purchase_detail");
+                name: "t_order_detail");
 
             migrationBuilder.DropTable(
                 name: "m_product");
 
             migrationBuilder.DropTable(
-                name: "t_purchase");
+                name: "t_order");
 
             migrationBuilder.DropTable(
                 name: "m_category");
@@ -293,9 +263,6 @@ namespace PetAdoption.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "m_customer");
-
-            migrationBuilder.DropTable(
-                name: "m_service");
 
             migrationBuilder.DropTable(
                 name: "m_account");

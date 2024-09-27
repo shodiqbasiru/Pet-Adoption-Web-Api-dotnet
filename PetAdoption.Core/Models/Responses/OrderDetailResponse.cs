@@ -1,6 +1,6 @@
 namespace PetAdoption.Core.Models.Responses;
 
-public class PurchaseDetailResponse
+public class OrderDetailResponse
 {
     public string? Id { get; set; }
     public string? ProductId { get; set; }

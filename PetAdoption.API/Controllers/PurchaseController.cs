@@ -12,25 +12,25 @@ namespace PetAdoption.API.Controllers;
 [Route("api/purchases")]
 public class PurchaseController : ControllerBase
 {
-    private readonly IPurchaseService _purchaseService;
+    private readonly IOrderService _orderService;
 
-    public PurchaseController(IPurchaseService purchaseService)
+    public PurchaseController(IOrderService orderService)
     {
-        _purchaseService = purchaseService;
+        _orderService = orderService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateTransaction([FromBody] PurchaseRequest request)
+    public async Task<IActionResult> CreateTransaction([FromBody] OrderRequest request)
     {
-        PurchaseResponse purchase = await _purchaseService.CreateTransaction(request);
-        return Created("/api/purchases", purchase);
+        OrderResponse order = await _orderService.CreateTransaction(request);
+        return Created("/api/purchases", order);
     }
     
     [HttpGet]
     public async Task<IActionResult> GetAllTransaction()
     {
-        var purchases = await _purchaseService.GetAllTransaction();
-        var responses = new CustomResponse<List<PurchaseResponse>>
+        var purchases = await _orderService.GetAllTransaction();
+        var responses = new CustomResponse<List<OrderResponse>>
         {
             StatusCode = (int)HttpStatusCode.OK,
             Message = "Get All Data Successfully",

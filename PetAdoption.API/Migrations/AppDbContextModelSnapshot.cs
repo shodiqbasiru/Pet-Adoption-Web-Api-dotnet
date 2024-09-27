@@ -125,6 +125,56 @@ namespace PetAdoption.API.Migrations
                     b.ToTable("m_customer");
                 });
 
+            modelBuilder.Entity("PetAdoption.Core.Entities.Order", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("customer_id");
+
+                    b.Property<DateTime>("TransDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("trans_date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("t_order");
+                });
+
+            modelBuilder.Entity("PetAdoption.Core.Entities.OrderDetail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("order_id");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("product_id");
+
+                    b.Property<long>("Qty")
+                        .HasColumnType("bigint")
+                        .HasColumnName("qty");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("t_order_detail");
+                });
+
             modelBuilder.Entity("PetAdoption.Core.Entities.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -182,70 +232,6 @@ namespace PetAdoption.API.Migrations
                     b.ToTable("m_product");
                 });
 
-            modelBuilder.Entity("PetAdoption.Core.Entities.Purchase", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("customer_id");
-
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("service_id");
-
-                    b.Property<DateTime>("TransDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("trans_date");
-
-                    b.Property<string>("TransType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("trans_type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ServiceId");
-
-                    b.ToTable("t_purchase");
-                });
-
-            modelBuilder.Entity("PetAdoption.Core.Entities.PurchaseDetail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("PetId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("pet_id");
-
-                    b.Property<Guid?>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PurchaseId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("purchase_id");
-
-                    b.Property<long>("Qty")
-                        .HasColumnType("bigint")
-                        .HasColumnName("qty");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("PurchaseId");
-
-                    b.ToTable("t_purchase_detail");
-                });
-
             modelBuilder.Entity("PetAdoption.Core.Entities.Review", b =>
                 {
                     b.Property<Guid>("Id")
@@ -284,43 +270,6 @@ namespace PetAdoption.API.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("m_review");
-                });
-
-            modelBuilder.Entity("PetAdoption.Core.Entities.Service", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
-
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint")
-                        .HasColumnName("price");
-
-                    b.Property<string>("ServiceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("service_name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("m_service");
                 });
 
             modelBuilder.Entity("PetAdoption.Core.Entities.Store", b =>
@@ -374,6 +323,36 @@ namespace PetAdoption.API.Migrations
                     b.Navigation("Account");
                 });
 
+            modelBuilder.Entity("PetAdoption.Core.Entities.Order", b =>
+                {
+                    b.HasOne("PetAdoption.Core.Entities.Customer", "Customer")
+                        .WithMany("Orders")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("PetAdoption.Core.Entities.OrderDetail", b =>
+                {
+                    b.HasOne("PetAdoption.Core.Entities.Order", "Order")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PetAdoption.Core.Entities.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("PetAdoption.Core.Entities.Product", b =>
                 {
                     b.HasOne("PetAdoption.Core.Entities.Category", "Category")
@@ -391,42 +370,6 @@ namespace PetAdoption.API.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Store");
-                });
-
-            modelBuilder.Entity("PetAdoption.Core.Entities.Purchase", b =>
-                {
-                    b.HasOne("PetAdoption.Core.Entities.Customer", "Customer")
-                        .WithMany("Purchases")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PetAdoption.Core.Entities.Service", "Service")
-                        .WithMany("Purchases")
-                        .HasForeignKey("ServiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Service");
-                });
-
-            modelBuilder.Entity("PetAdoption.Core.Entities.PurchaseDetail", b =>
-                {
-                    b.HasOne("PetAdoption.Core.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId");
-
-                    b.HasOne("PetAdoption.Core.Entities.Purchase", "Purchase")
-                        .WithMany("PurchaseDetails")
-                        .HasForeignKey("PurchaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Purchase");
                 });
 
             modelBuilder.Entity("PetAdoption.Core.Entities.Review", b =>
@@ -473,24 +416,19 @@ namespace PetAdoption.API.Migrations
 
             modelBuilder.Entity("PetAdoption.Core.Entities.Customer", b =>
                 {
-                    b.Navigation("Purchases");
+                    b.Navigation("Orders");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("PetAdoption.Core.Entities.Order", b =>
+                {
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("PetAdoption.Core.Entities.Product", b =>
                 {
                     b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("PetAdoption.Core.Entities.Purchase", b =>
-                {
-                    b.Navigation("PurchaseDetails");
-                });
-
-            modelBuilder.Entity("PetAdoption.Core.Entities.Service", b =>
-                {
-                    b.Navigation("Purchases");
                 });
 
             modelBuilder.Entity("PetAdoption.Core.Entities.Store", b =>

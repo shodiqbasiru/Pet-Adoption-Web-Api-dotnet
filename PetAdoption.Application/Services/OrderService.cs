@@ -6,38 +6,38 @@ using PetAdoption.Infrastructure.Interfaces;
 
 namespace PetAdoption.Application.Services;
 
-public class PurchaseService : IPurchaseService
+public class OrderService : IOrderService
 {
     private readonly IUnitOfWork _uow;
     private readonly IProductService _productService;
 
-    public PurchaseService(IUnitOfWork uow, IProductService petService)
+    public OrderService(IUnitOfWork uow, IProductService petService)
     {
         _uow = uow;
         _productService = petService;
     }
 
-    public async Task<PurchaseResponse> CreateTransaction(PurchaseRequest request)
+    public async Task<OrderResponse> CreateTransaction(OrderRequest request)
     {
 
-        var newTrx = await _uow.ExecuteTransactionAsync<Purchase>(async () =>
+        var newTrx = await _uow.ExecuteTransactionAsync<Order>(async () =>
          {
-             var payload = new Purchase
+             var payload = new Order
              {
                  TransDate = DateTime.Now,
                  CustomerId = Guid.Parse(request.CustomerId),
-                 PurchaseDetails = request.PurchaseDetails.Select(detail => new PurchaseDetail
+                 OrderDetails = request.PurchaseDetails.Select(detail => new OrderDetail
                  {
-                     PetId = Guid.Parse(detail.ProductID),
+                     ProductId = Guid.Parse(detail.ProductID),
                      Qty = detail.Qty
                  }).ToList()
              };
-             var purchase = await _uow.Repository<Purchase>().SaveAsync(payload);
+             var purchase = await _uow.Repository<Order>().SaveAsync(payload);
              await _uow.SaveChangesAsync();
 
-             foreach (var detail in purchase.PurchaseDetails)
+             foreach (var detail in purchase.OrderDetails)
              {
-                 var pet = await _productService.FindById(detail.PetId.ToString());
+                 var pet = await _productService.FindById(detail.ProductId.ToString());
                  pet.Stock -= detail.Qty;
              }
 
@@ -46,38 +46,38 @@ public class PurchaseService : IPurchaseService
 
          });
 
-        List<PurchaseDetailResponse> detailResponses = newTrx!.PurchaseDetails.Select(detail =>
-                new PurchaseDetailResponse
+        List<OrderDetailResponse> detailResponses = newTrx!.OrderDetails.Select(detail =>
+                new OrderDetailResponse
                 {
                     Id = detail.Id.ToString(),
-                    ProductId = detail.PetId.ToString(),
+                    ProductId = detail.ProductId.ToString(),
                     Qty = detail.Qty
                 }).ToList();
 
 
-        PurchaseResponse response = new()
+        OrderResponse response = new()
         {
             Id = newTrx.Id.ToString(),
             CustomerId = newTrx.CustomerId.ToString(),
             TransDate = newTrx.TransDate,
-            PurchaseDetail = detailResponses
+            OrderDetails = detailResponses
         };
 
         return response;
     }
 
-    public async Task<List<PurchaseResponse>> GetAllTransaction()
+    public async Task<List<OrderResponse>> GetAllTransaction()
     {
-        var purchases = await _uow.Repository<Purchase>().FindAllAsync(new[] { "PurchaseDetails" });
-        return purchases.Select(purchase => new PurchaseResponse
+        var purchases = await _uow.Repository<Order>().FindAllAsync(new[] { "OrderDetails" });
+        return purchases.Select(purchase => new OrderResponse
         {
             Id = purchase.Id.ToString(),
             CustomerId = purchase.CustomerId.ToString(),
             TransDate = purchase.TransDate,
-            PurchaseDetail = purchase.PurchaseDetails.Select(detail => new PurchaseDetailResponse
+            OrderDetails = purchase.OrderDetails.Select(detail => new OrderDetailResponse
             {
                 Id = detail.Id.ToString(),
-                ProductId = detail.PetId.ToString(),
+                ProductId = detail.ProductId.ToString(),
                 Qty = detail.Qty
             }).ToList(),
         }).ToList();
