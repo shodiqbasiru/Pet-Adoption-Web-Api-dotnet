@@ -34,9 +34,8 @@ public static class SecurityExtension
     {
         services.AddSwaggerGen(sgo =>
         {
-            sgo.SwaggerDoc("v1", new() { Title = "My API", Version = "v1" });
+            sgo.SwaggerDoc("v1", new() { Title = "PetAdoption API", Version = "v1" });
 
-            // Define the BearerAuth scheme
             sgo.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description =

@@ -9,10 +9,10 @@ public class AppDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Product> Pets => Set<Product>();
     public DbSet<Category> Category => Set<Category>();
-    public DbSet<Purchase> Purchases => Set<Purchase>();
-    public DbSet<PurchaseDetail> PurchaseDetails => Set<PurchaseDetail>();
+    public DbSet<Order> Purchases => Set<Order>();
+    public DbSet<OrderDetail> PurchaseDetails => Set<OrderDetail>();
     public DbSet<Store> Stores => Set<Store>();
-    public DbSet<Service> Services => Set<Service>();
+    public DbSet<Review> Reviews => Set<Review>();
 
     protected AppDbContext()
     {
@@ -50,29 +50,38 @@ public class AppDbContext : DbContext
         .WithMany(c => c.Products)
         .HasForeignKey(p => p.CategoryId);
 
-        // relationship between Customer and Purchase => 1 Customer can have many Purchases
-        modelBuilder.Entity<Purchase>()
+        // relationship between Customer and Order => 1 Customer can have many Orders
+        modelBuilder.Entity<Order>()
         .HasOne(p => p.Customer)
-        .WithMany(c => c.Purchases)
+        .WithMany(c => c.Orders)
         .HasForeignKey(p => p.CustomerId);
 
-        // relationship between Purchase and Purchase Detail => 1 Purchase can have many Purchase Details
-        modelBuilder.Entity<PurchaseDetail>()
-        .HasOne(pd => pd.Purchase)
-        .WithMany(p => p.PurchaseDetails)
-        .HasForeignKey(pd => pd.PurchaseId);
+        // relationship between Order and Order Detail => 1 Order can have many Order Details
+        modelBuilder.Entity<OrderDetail>()
+        .HasOne(pd => pd.Order)
+        .WithMany(p => p.OrderDetails)
+        .HasForeignKey(pd => pd.OrderId)
+        .OnDelete(DeleteBehavior.Restrict);
 
         // relationship between Product And Store  => 1 Store can have many Products
         modelBuilder.Entity<Product>()
         .HasOne(p => p.Store)
         .WithMany(s => s.Products)
         .HasForeignKey(p => p.StoreId);
+        
+        // relationship between Review and Product => 1 Product can have many Reviews
+        modelBuilder.Entity<Review>()
+        .HasOne(r => r.Product)
+        .WithMany(p => p.Reviews)
+        .HasForeignKey(r => r.ProductId)
+        .OnDelete(DeleteBehavior.Restrict);
 
-        // relationship between Service And Purchase => 1 Service can have many Purchases
-        modelBuilder.Entity<Service>()
-        .HasMany(s => s.Purchases)
-        .WithOne(p => p.Service)
-        .HasForeignKey(p => p.ServiceId);
+        // relationship between Review and Customer => 1 Customer can have many Reviews
+        modelBuilder.Entity<Review>()
+        .HasOne(r => r.Customer)
+        .WithMany(c => c.Reviews)
+        .HasForeignKey(r => r.CustomerId)
+        .OnDelete(DeleteBehavior.Restrict);
 
         // convert enum to string
         modelBuilder.Entity<Account>()
@@ -80,12 +89,6 @@ public class AppDbContext : DbContext
             .HasConversion(
                 v => v.ToString(),
                 v => (Role)Enum.Parse(typeof(Role), v));
-
-        modelBuilder.Entity<Purchase>()
-            .Property(e => e.TransType)
-            .HasConversion(
-                v => v.ToString(),
-                v => (TransType)Enum.Parse(typeof(TransType), v));
 
         base.OnModelCreating(modelBuilder);
     }

@@ -45,7 +45,6 @@ public class StoreService : IStoreService
     {
         var store = await FindById(request.Id ?? throw new BadRequestException("Id is required"));
         store.StoreName = request.StoreName;
-        store.Rating = request.Rating;
         store.Address = request.Address;
         store.UpdatedAt = DateTime.Now;
         await _uow.SaveChangesAsync();

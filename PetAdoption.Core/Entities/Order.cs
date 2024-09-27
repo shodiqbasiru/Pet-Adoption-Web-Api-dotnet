@@ -5,8 +5,8 @@ using PetAdoption.Core.Constants;
 
 namespace PetAdoption.Core.Entities;
 
-[Table(name:"t_purchase")]
-public class Purchase
+[Table(name:"t_order")]
+public class Order
 {
     [Key,Column(name:"id")]
     public Guid Id { get; set; }
@@ -14,20 +14,13 @@ public class Purchase
     [Column(name:"trans_date")]
     public DateTime TransDate { get; set; }
     
-    [Column(name:"trans_type")]
-    public TransType TransType { get; set; }    
-
     [Column(name:"customer_id")]
     public Guid CustomerId { get; set; }
 
-    [Column(name:"service_id")]    
-    public Guid ServiceId { get; set; }
 
-
-    public List<PurchaseDetail> PurchaseDetails { get; set; } = null!; 
+    public List<OrderDetail> OrderDetails { get; set; } = null!; 
     
     [JsonIgnore]
     public Customer? Customer { get; set; }
-    [JsonIgnore]
-    public Service? Service { get; set; }
+    
 }

@@ -23,12 +23,13 @@ public class CustomerService : ICustomerService
         return customer;
     }
 
-    public async Task<Customer> FindById(Guid id)
+    public async Task<Customer> FindById(string id)
     {
-        return await _uow.Repository<Customer>().FindByIdAsync(id) ?? throw new NotFoundException("customer not found");
+        if(!Guid.TryParse(id, out var customerId)) throw new NotFoundException("customer not found");
+        return await _uow.Repository<Customer>().FindByIdAsync(customerId) ?? throw new NotFoundException("customer not found");
     }
 
-    public async Task<CustomerResponse> FindCustomerById(Guid id)
+    public async Task<CustomerResponse> FindCustomerById(string id)
     {
         var customer = await FindById(id);
         return customer.ConvertToCustomerResponse();
@@ -63,10 +64,10 @@ public class CustomerService : ICustomerService
         return customer.ConvertToCustomerResponse();
     }
 
-    public async Task DeleteById(Guid id)
+    public async Task DeleteById(string id)
     {
         string[] includes = { "Account" };
-        var customer = await _uow.Repository<Customer>().FindAsync(c => c.Id == id, includes);
+        var customer = await _uow.Repository<Customer>().FindAsync(c => c.Id == Guid.Parse(id), includes);
         customer.Account.IsActive = false;
         _uow.Repository<Customer>().Update(customer);
         await _uow.SaveChangesAsync();

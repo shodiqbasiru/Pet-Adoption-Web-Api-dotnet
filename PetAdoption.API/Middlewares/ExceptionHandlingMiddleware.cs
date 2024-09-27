@@ -25,14 +25,6 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 "/api/auth/register-seller"
             };
 
-            // var token = context.Request.Headers["Authorization"].ToString();
-            // if (token.StartsWith("Bearer "))
-            // {
-            //     token = token[7..];
-            // }
-
-            // _logger.LogInformation("Token: {}", token);
-
             var path = context.Request.Path.Value!.ToLower();
             if (allowPaths.Contains(path))
             {

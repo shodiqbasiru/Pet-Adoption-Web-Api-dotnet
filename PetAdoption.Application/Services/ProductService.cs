@@ -31,7 +31,6 @@ public class ProductService : IProductService
             ProductName = request.ProductName,
             Price = request.Price,
             Stock = request.Stock,
-            Rating = request.Rating,
             Description = request.Description,
             Url = request.Url,
             CreatedAt = DateTime.Now,
@@ -69,7 +68,6 @@ public class ProductService : IProductService
         currentProduct.ProductName = request.ProductName;
         currentProduct.Price = request.Price;
         currentProduct.Stock = request.Stock;
-        currentProduct.Rating = request.Rating;
         currentProduct.Description = request.Description;
         currentProduct.Url = request.Url;
         currentProduct.UpdatedAt = DateTime.Now;

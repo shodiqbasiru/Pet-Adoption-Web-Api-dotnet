@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PetAdoption.Core.Models.Requests;
 
-public class PurchaseRequest
+public class OrderRequest
 {
     [Required]
     public string CustomerId { get; set; } = null!;
